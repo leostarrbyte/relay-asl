@@ -1,12 +1,14 @@
 # Relay — ASL concept prototype
 
-Eight screens from the **CONCEPT ASL** Figma frames, built in plain HTML/CSS/JS on
-Orange OUDS tokens, plus two layers the static frames could not carry:
+Nine screens from the **CONCEPT ASL** Figma frames, built in plain HTML/CSS/JS on
+Orange OUDS tokens, plus three layers the static frames could not carry:
 
 - **Camera AI** — the phone locks onto a hand, draws 21 landmarks, and turns signs
   into English one sign at a time, with a confidence figure on each.
 - **Voice AI** — speech arrives as captions that correct themselves as the
   recogniser settles.
+- **Avatar ASL** — the reply plays back on the signing avatar, with a progress line
+  and the English tracking word by word underneath it.
 
 Both are **simulations**. No camera or microphone is accessed, nothing is uploaded,
 and there is no network call at runtime.

@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#141414">
-<meta name="description" content="A working prototype of Relay: eight screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language and a live voice layer that transcribes speech.">
+<meta name="description" content="A working prototype of Relay: nine screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language, a live voice layer that transcribes speech, and an avatar that signs the reply back.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://leostarrbyte.github.io/relay-asl/">
 <meta property="og:title" content="Relay — ASL concept prototype">
-<meta property="og:description" content="A working prototype of Relay: eight screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language and a live voice layer that transcribes speech.">
-<meta property="og:image" content="https://leostarrbyte.github.io/relay-asl/assets/share.png"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:description" content="A working prototype of Relay: nine screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language, a live voice layer that transcribes speech, and an avatar that signs the reply back.">
+<meta property="og:image" content="https://leostarrbyte.github.io/relay-asl/assets/share.png">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Relay — ASL concept prototype">
-<meta name="twitter:description" content="A working prototype of Relay: eight screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language and a live voice layer that transcribes speech.">
+<meta name="twitter:description" content="A working prototype of Relay: nine screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language, a live voice layer that transcribes speech, and an avatar that signs the reply back.">
 <style>
 :root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;font-size:14px}
@@ -206,6 +208,16 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
 .handoff .ho-note{margin:0 0 4px;font-size:14px;line-height:20px;font-weight:700;color:var(--content)}
 .handoff .ho-sub{margin:0 0 16px;font-size:12px;line-height:16px;color:var(--content-muted)}
 
+/* ---- 9 · avatar player ---- */
+#watch .player{position:absolute;left:16px;top:208px;width:328px;height:328px;border-radius:22px;overflow:hidden;background:#2B3542}
+#watch .player > video{position:absolute;left:0;top:0;width:328px;height:328px;object-fit:cover;display:block;
+  transform:scale(1.38);transform-origin:50% 46%}
+#watch .track{position:absolute;left:0;top:276px;width:328px;height:4px;background:rgba(255,255,255,.18)}
+#watch .track i{display:block;height:100%;width:0;background:var(--orange)}
+#watch .bar{position:absolute;left:0;top:280px;width:328px;height:48px;background:var(--bg);display:flex;align-items:center;gap:16px;padding-left:16px}
+#watch .bar button{width:140px;min-height:40px;border:0;border-radius:8px;background:transparent;color:var(--content);
+  font:inherit;font-size:14px;font-weight:700;line-height:20px;letter-spacing:.175px;cursor:pointer}
+
 /* ---- page notes ---- */
 .notes{margin-top:34px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
 .note{background:var(--page-card);border:1px solid var(--page-line);border-radius:16px;padding:20px}
@@ -228,7 +240,7 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
 
   <div class="masthead">
     <h1>Relay · ASL AI Concept — built from Figma</h1>
-    <p>The eight frames of <b>CONCEPT ASL</b> in code, on the OUDS tokens read from the file. Two layers the static frames could not carry are live here: the microphone listening and transcribing, and the camera reading sign language.</p>
+    <p>Nine frames from <b>CONCEPT ASL</b> in code, on the OUDS tokens read from the file. Two layers the static frames could not carry are live here: the microphone listening and transcribing, and the camera reading sign language.</p>
     <p class="howto"><b>How to try it:</b> tap the chips below to move between screens. Two of them run by themselves — <b>Camera AI</b>, where the phone locks onto a hand and turns signs into English one sign at a time, and <b>Voice AI</b>, where speech arrives as captions that correct themselves as they settle. Both restart every time you open them, so give each about fifteen seconds. Nothing here uses your real camera or microphone.</p>
   </div>
 
@@ -460,9 +472,41 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
         </div>
 
         <div class="handoff">
-          <button class="btn btn-outline" type="button" data-go="sign">Watch in sign language</button>
+          <button class="btn btn-outline" type="button" data-go="watch">Watch in sign language</button>
           <button class="btn btn-cream" type="button" data-go="sign">Reply with signs</button>
           <button class="btn btn-outline" type="button" id="pause-listen">Pause listening</button>
+        </div>
+        <div class="handle"><i></i></div>
+      </section>
+
+      <!-- ========== 9 · WATCH IN SIGN LANGUAGE ========== -->
+      <section class="screen" id="watch" aria-label="Watch the reply in sign language">
+        <div class="statusbar"><span class="t">9:33</span><span class="icons"><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="8" height="15" alt=""></span></div>
+        <button class="backlink" type="button" data-go="listening"><img src="assets/chevron.svg" alt="">Live captions</button>
+
+        <div style="position:absolute;left:16px;top:120px;width:328px">
+          <h1 class="h-xl">In sign language</h1>
+          <p class="b-m" style="margin-top:8px">Their adapted in ASL - WOLOF</p>
+        </div>
+
+        <div class="player">
+          <video id="watch-video" src="assets/avatar.mp4" muted playsinline preload="metadata"
+                 aria-label="An avatar signing in American Sign Language"></video>
+          <div class="track" aria-hidden="true"><i id="watch-progress"></i></div>
+          <div class="bar">
+            <button type="button" id="watch-play">Pause</button>
+            <button type="button" id="watch-replay">Replay</button>
+          </div>
+        </div>
+
+        <div style="position:absolute;left:16px;top:550px;width:328px;height:40px;display:flex;align-items:center">
+          <p class="h-s muted" id="watch-state">Saying...</p>
+        </div>
+        <p class="b-l spoken" style="position:absolute;left:16px;top:598px;width:328px;color:var(--content)" id="watch-text" aria-live="polite"></p>
+
+        <div style="position:absolute;left:16px;top:664px;width:328px">
+          <button class="btn btn-cream" type="button" data-go="sign">Reply with signs</button>
+          <button class="btn btn-outline" type="button" style="margin-top:12px" data-go="listening">Back to live captions</button>
         </div>
         <div class="handle"><i></i></div>
       </section>
@@ -487,6 +531,7 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
       <ul>
         <li><b>Interim words</b><span>The newest words are dotted and dim while the recogniser is still unsure of them, then settle. That flicker is what a live transcript really looks like.</span></li>
         <li><b>The meter follows the speech</b><span>It falls to near silence between phrases instead of looping, so the bars mean something.</span></li>
+        <li><b>Or watch it signed</b><span>A rendered signing clip plays on the avatar with the English tracking underneath, so you can see which part is being signed. Pause and Replay drive the clip itself. <button type="button" data-go="watch">Open it</button></span></li>
         <li><b>It says when it stops</b><span>At the end of the sentence the status line changes. <button type="button" data-go="listening">Run it again</button></span></li>
       </ul>
     </div>
@@ -508,7 +553,7 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
   var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
   var labels = {
     splash:'Splash', perms:'Permissions', welcome:'What Relay does', turn:'Turn it around',
-    whose:'Whose turn?', sign:'Camera AI', speaking:'Speaking', listening:'Voice AI'
+    whose:'Whose turn?', sign:'Camera AI', speaking:'Speaking', listening:'Voice AI', watch:'Avatar ASL'
   };
   var index = document.getElementById('index');
   screens.forEach(function (s, i) {
@@ -547,6 +592,7 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
     if (id === 'sign') renderCamera(t);
     else if (id === 'listening') renderListening(t);
     else if (id === 'speaking') renderSpeaking(t);
+    else if (id === 'watch') renderWatch(t);
   }
   // test hook: draw any moment of either layer without waiting for it
   window.__relaySeek = function (id, t) { stopAnim(); render(id, t); };
@@ -758,7 +804,49 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
     if (status.textContent !== msg) status.textContent = msg;
   }
 
-  var END = { sign: READ_DONE + 900, speaking: SP_END + 300, listening: HEAR_END + 300 };
+
+  /* ================= 9 · avatar player ================= */
+  // The avatar is a pre-rendered clip, so "playing" means a clock: the progress
+  // line and the English underneath move together, which is what tells you which
+  // part of the sentence is being signed right now.
+  var WATCH_WORDS = ('\u201CYes, we have Orangina Rouge and mango-passion fruit in the fridge '
+                   + 'right behind you.\u201D').split(' ');
+  var W_IN = 500, W_STEP = 950;   // the clip is 15s long
+  var W_END = W_IN + WATCH_WORDS.length * W_STEP;
+
+  function clip() { return document.getElementById('watch-video'); }
+  function clipPlay(from) {
+    var v = clip();
+    if (!v) return;
+    if (from !== undefined) { try { v.currentTime = from / 1000; } catch (e) {} }
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {});   // autoplay refused: Replay still starts it
+  }
+
+  function renderWatch(t) {
+    var holder = document.getElementById('watch-text');
+    var state = document.getElementById('watch-state');
+    var prog = document.getElementById('watch-progress');
+    if (holder.childElementCount !== WATCH_WORDS.length) {
+      holder.innerHTML = '';
+      WATCH_WORDS.forEach(function (w, i) {
+        var sp = document.createElement('span');
+        sp.textContent = w + (i < WATCH_WORDS.length - 1 ? ' ' : '');
+        holder.appendChild(sp);
+      });
+    }
+    var spans = holder.children;
+    var i = Math.floor((t - W_IN) / W_STEP);
+    var over = t >= W_END;
+    for (var k = 0; k < spans.length; k++) {
+      spans[k].className = over ? 'said' : (k < i ? 'said' : (k === i ? 'now' : 'todo'));
+    }
+    prog.style.width = Math.max(0, Math.min(100, (t / W_END) * 100)).toFixed(1) + '%';
+    var msg = over ? 'Finished signing' : 'Saying...';
+    if (state.textContent !== msg) state.textContent = msg;
+  }
+
+  var END = { sign: READ_DONE + 900, watch: W_END + 400, speaking: SP_END + 300, listening: HEAR_END + 300 };
 
   /* ---------- routing ---------- */
   function show(id) {
@@ -770,7 +858,11 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
       b.setAttribute('aria-current', b.dataset.go === id ? 'true' : 'false');
     });
     try { if (location.hash.slice(1) !== id) history.replaceState(null, '', '#' + id); } catch (e) {}
-    if (id === 'sign' || id === 'speaking' || id === 'listening') {
+    if (id === 'watch') {
+      document.getElementById('watch-play').textContent = 'Pause';
+      clipPlay(0);
+    }
+    if (id === 'sign' || id === 'speaking' || id === 'listening' || id === 'watch') {
       if (id === 'listening') {
         paused = false;
         document.getElementById('pause-listen').textContent = 'Pause listening';
@@ -795,6 +887,24 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
       grant.style.color = on ? 'var(--on-cream)' : '#FFFFFF';
       var n = document.querySelectorAll('#perms [data-grant][data-on="1"]').length;
       document.getElementById('perm-continue').className = n ? 'btn btn-orange' : 'btn btn-ghostgrey';
+      return;
+    }
+
+    var play = e.target.closest('#watch-play');
+    if (play) {
+      if (anim.id === 'watch') {
+        holdAnim(); renderWatch(anim.held); clip().pause(); play.textContent = 'Resume';
+      } else {
+        startAnim('watch', anim.held); clipPlay(); play.textContent = 'Pause';
+      }
+      return;
+    }
+    var replay = e.target.closest('#watch-replay');
+    if (replay) {
+      anim.held = 0;
+      startAnim('watch', 0);
+      clipPlay(0);
+      document.getElementById('watch-play').textContent = 'Pause';
       return;
     }
 
