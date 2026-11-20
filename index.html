@@ -69,18 +69,11 @@ img{max-width:100%}
 
 *{box-sizing:border-box}
 body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
-.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px;max-width:1120px;margin:0 auto}
+.wrap{min-height:100svh;display:flex;align-items:center;justify-content:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
 :where(a,button):focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 
-.masthead h1{margin:0 0 6px;font-size:clamp(21px,3.6vw,27px);font-weight:700;letter-spacing:-.02em}
-.masthead p{margin:0;font-size:14.5px;line-height:1.5;color:var(--page-muted);max-width:66ch}
-.howto{margin-top:14px;padding:13px 15px;border-radius:14px;background:var(--page-card);border:1px solid var(--page-line);font-size:14.5px;line-height:1.55;color:var(--page-muted);max-width:66ch}
-.howto b{color:var(--page-ink)}
 
-.index{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 22px}
-.index button{display:flex;align-items:center;gap:7px;min-height:38px;padding:0 13px;border-radius:19px;border:1px solid var(--page-line);background:var(--page-card);color:var(--page-ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
-.index button[aria-current="true"]{background:var(--page-ink);color:var(--page-bg);border-color:var(--page-ink)}
-.index button i{font-style:normal;opacity:.5;font-weight:700;font-variant-numeric:tabular-nums}
 
 .stage{display:flex;justify-content:center}
 .phone{position:relative;width:360px;max-width:100%;height:800px;border-radius:30px;overflow:hidden;background:var(--bg);color:var(--content);box-shadow:0 26px 60px -28px rgba(0,0,0,.55);border:1px solid var(--page-line)}
@@ -219,14 +212,6 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
   font:inherit;font-size:14px;font-weight:700;line-height:20px;letter-spacing:.175px;cursor:pointer}
 
 /* ---- page notes ---- */
-.notes{margin-top:34px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
-.note{background:var(--page-card);border:1px solid var(--page-line);border-radius:16px;padding:20px}
-.note h2{margin:0 0 4px;font-size:16px;font-weight:700}
-.note p{margin:0 0 12px;font-size:13px;line-height:1.5;color:var(--page-muted)}
-.note ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
-.note li{font-size:13.5px;line-height:1.5;color:var(--page-muted)}
-.note li b{display:block;color:var(--page-ink)}
-.note button{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--page-ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
 @media (prefers-reduced-motion: reduce){
   #sign .sign-chip{animation:none}
@@ -237,14 +222,6 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
 
 
 <div class="wrap">
-
-  <div class="masthead">
-    <h1>Relay · ASL AI Concept — built from Figma</h1>
-    <p>Nine frames from <b>CONCEPT ASL</b> in code, on the OUDS tokens read from the file. Two layers the static frames could not carry are live here: the microphone listening and transcribing, and the camera reading sign language.</p>
-    <p class="howto"><b>How to try it:</b> tap the chips below to move between screens. Two of them run by themselves — <b>Camera AI</b>, where the phone locks onto a hand and turns signs into English one sign at a time, and <b>Voice AI</b>, where speech arrives as captions that correct themselves as they settle. Both restart every time you open them, so give each about fifteen seconds. Nothing here uses your real camera or microphone.</p>
-  </div>
-
-  <nav class="index" id="index" aria-label="Screens"></nav>
 
   <div class="stage">
     <div class="phone" id="phone">
@@ -514,56 +491,11 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
     </div>
   </div>
 
-  <div class="notes">
-    <div class="note">
-      <h2>The camera layer</h2>
-      <p>What a static frame cannot show: the camera deciding it is looking at a hand, and turning signs into words.</p>
-      <ul>
-        <li><b>Lock, then read</b><span>The dashed box is the design's. It goes solid only once the hand is tracked — so "I am not seeing you" and "I am reading you" never look the same.</span></li>
-        <li><b>Twenty-one landmarks</b><span>The overlay is the hand model the recogniser would actually use, drifting frame to frame rather than sitting still.</span></li>
-        <li><b>Glosses, then English</b><span>Signs land one at a time with a confidence figure. ORANGINA arrives fingerspelled and low, and the question mark comes from raised brows, not a word.</span></li>
-        <li><b>Say it stays disabled</b><span>Until there is a whole sentence. <button type="button" data-go="sign">Run it again</button></span></li>
-      </ul>
-    </div>
-    <div class="note">
-      <h2>The voice layer</h2>
-      <p>The microphone side of the same conversation.</p>
-      <ul>
-        <li><b>Interim words</b><span>The newest words are dotted and dim while the recogniser is still unsure of them, then settle. That flicker is what a live transcript really looks like.</span></li>
-        <li><b>The meter follows the speech</b><span>It falls to near silence between phrases instead of looping, so the bars mean something.</span></li>
-        <li><b>Or watch it signed</b><span>A rendered signing clip plays on the avatar with the English tracking underneath, so you can see which part is being signed. Pause and Replay drive the clip itself. <button type="button" data-go="watch">Open it</button></span></li>
-        <li><b>It says when it stops</b><span>At the end of the sentence the status line changes. <button type="button" data-go="listening">Run it again</button></span></li>
-      </ul>
-    </div>
-    <div class="note">
-      <h2>Built from the file</h2>
-      <p>Tokens and assets read from <b>CONCEPT ASL</b>, not eyeballed.</p>
-      <ul>
-        <li><b>OUDS values</b><span>#141414 ground, #EEE content, 64% muted, #793AB3 Listen, #317660 Sign, #FFF5E9 buttons, 22px cards, 8px buttons, 48px targets.</span></li>
-        <li><b>Real assets</b><span>The photo, the logo, the card glyphs and the OUDS icons come from the file. The waveform is the one thing I replaced — the frame holds 34 fixed bars; here they move.</span></li>
-        <li><b>Not connected</b><span>Figma offered Code Connect mappings for the buttons. There is no component library here to map to, so this is plain HTML. Worth doing when it lands in the real app.</span></li>
-      </ul>
-    </div>
-  </div>
-
 </div>
 
 <script>
 (function () {
   var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
-  var labels = {
-    splash:'Splash', perms:'Permissions', welcome:'What Relay does', turn:'Turn it around',
-    whose:'Whose turn?', sign:'Camera AI', speaking:'Speaking', listening:'Voice AI', watch:'Avatar ASL'
-  };
-  var index = document.getElementById('index');
-  screens.forEach(function (s, i) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.dataset.go = s.id;
-    b.innerHTML = '<i>' + (i + 1) + '</i>' + (labels[s.id] || s.id);
-    index.appendChild(b);
-  });
-
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ------------------------------------------------------------------
@@ -854,9 +786,6 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
     if (!target) return;
     stopAnim();
     screens.forEach(function (s) { s.classList.toggle('on', s === target); });
-    index.querySelectorAll('button').forEach(function (b) {
-      b.setAttribute('aria-current', b.dataset.go === id ? 'true' : 'false');
-    });
     try { if (location.hash.slice(1) !== id) history.replaceState(null, '', '#' + id); } catch (e) {}
     if (id === 'watch') {
       document.getElementById('watch-play').textContent = 'Pause';
