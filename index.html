@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141414">
+<meta name="description" content="A working prototype of Relay: eight screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language and a live voice layer that transcribes speech.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Relay — ASL concept prototype">
+<meta property="og:description" content="A working prototype of Relay: eight screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language and a live voice layer that transcribes speech.">
+<meta property="og:image" content="assets/share.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Relay — ASL concept prototype">
+<meta name="twitter:description" content="A working prototype of Relay: eight screens built from the CONCEPT ASL Figma file on Orange OUDS tokens, with a live camera layer that reads sign language and a live voice layer that transcribes speech.">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Relay ASL Prototype</title>
+<style>
+/* ---------------------------------------------------------------
+   Relay · ASL AI Concept — built from the Figma file, OUDS tokens.
+   Screen canvas is the design's own 360 × 800; blocks sit at the
+   coordinates the Figma frames use, so the build can be diffed
+   against the frames directly.
+   --------------------------------------------------------------- */
+:root{
+  /* page chrome */
+  --page-bg:#F3F1EC; --page-card:#FFFFFF; --page-ink:#161616; --page-muted:#5C5A56; --page-line:#DFDBD3;
+
+  /* OUDS tokens, read from the file */
+  --bg:#141414;
+  --content:#EEEEEE;
+  --content-muted:rgba(255,255,255,.64);
+  --surface-secondary:rgba(255,255,255,.08);
+  --card:#1D1726;
+  --card-border:#352A43;
+  --cream:#FFF5E9;
+  --on-cream:#14101C;
+  --orange:#FF7900;
+  --purple:#793AB3;
+  --green:#317660;
+  --badge-teal:#137A5F;
+  --badge-purple:#8138BC;
+  --badge-orange:#F16E00;
+  --border:#3B3B3B;
+  --info-bg:rgba(0,89,138,.52);
+  --info-border:#8AD5FF;
+  --capture-fill:rgba(138,213,255,.15);
+  --capture-line:#6B91A0;
+  --live:#5FD0A8;
+
+  --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page-bg:#0F0F0F; --page-card:#191919; --page-ink:#F2F0EC; --page-muted:#9A9792; --page-line:#2A2A2A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --page-bg:#0F0F0F; --page-card:#191919; --page-ink:#F2F0EC; --page-muted:#9A9792; --page-line:#2A2A2A;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px;max-width:1120px;margin:0 auto}
+:where(a,button):focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+
+.masthead h1{margin:0 0 6px;font-size:clamp(21px,3.6vw,27px);font-weight:700;letter-spacing:-.02em}
+.masthead p{margin:0;font-size:14.5px;line-height:1.5;color:var(--page-muted);max-width:66ch}
+.howto{margin-top:14px;padding:13px 15px;border-radius:14px;background:var(--page-card);border:1px solid var(--page-line);font-size:14.5px;line-height:1.55;color:var(--page-muted);max-width:66ch}
+.howto b{color:var(--page-ink)}
+
+.index{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 22px}
+.index button{display:flex;align-items:center;gap:7px;min-height:38px;padding:0 13px;border-radius:19px;border:1px solid var(--page-line);background:var(--page-card);color:var(--page-ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.index button[aria-current="true"]{background:var(--page-ink);color:var(--page-bg);border-color:var(--page-ink)}
+.index button i{font-style:normal;opacity:.5;font-weight:700;font-variant-numeric:tabular-nums}
+
+.stage{display:flex;justify-content:center}
+.phone{position:relative;width:360px;max-width:100%;height:800px;border-radius:30px;overflow:hidden;background:var(--bg);color:var(--content);box-shadow:0 26px 60px -28px rgba(0,0,0,.55);border:1px solid var(--page-line)}
+@media (max-width:400px){ .phone{transform:scale(.95);transform-origin:top center;margin-bottom:-40px} }
+@media (max-width:345px){ .phone{transform:scale(.85);transform-origin:top center;margin-bottom:-120px} }
+
+.screen{position:absolute;inset:0;display:none;background:var(--bg)}
+.screen.on{display:block}
+
+/* ---- OUDS primitives ---- */
+.statusbar{position:absolute;left:0;top:0;width:360px;height:52px;display:flex;align-items:flex-end;justify-content:space-between;padding:10px 24px}
+.statusbar .t{font-size:14px;font-weight:500;line-height:20px;letter-spacing:.14px;color:var(--content)}
+.statusbar .icons{display:flex;align-items:center;gap:7px}
+.statusbar img{display:block}
+.handle{position:absolute;left:0;bottom:0;width:360px;padding:8px 16px;display:flex;justify-content:center;background:var(--bg)}
+.handle i{display:block;width:72px;height:2px;border-radius:8px;background:var(--content)}
+
+.h-xl{margin:0;font-size:28px;line-height:36px;font-weight:700;letter-spacing:-.28px;color:var(--content)}
+.h-s{margin:0;font-size:18px;line-height:24px;font-weight:700;letter-spacing:.18px}
+.d-s{margin:0;font-size:32px;line-height:40px;font-weight:700;letter-spacing:-.32px;color:var(--content)}
+.b-l{margin:0;font-size:16px;line-height:24px;letter-spacing:.2px}
+.b-m{margin:0;font-size:14px;line-height:20px;letter-spacing:.175px;color:var(--content-muted)}
+.l-s{margin:0;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.18px;color:var(--content-muted)}
+.muted{color:var(--content-muted)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:328px;min-height:48px;border-radius:8px;border:0;font:inherit;font-size:16px;font-weight:700;line-height:24px;letter-spacing:.2px;cursor:pointer;padding:12px 28px;text-align:center}
+.btn-cream{background:var(--cream);color:var(--on-cream)}
+.btn-orange{background:var(--orange);color:#000}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--content)}
+.btn-ghostgrey{background:#3B3B3B;color:var(--content-muted)}
+.btn img{width:20px;height:20px;display:block}
+.btn[disabled]{opacity:.45;cursor:default}
+
+.backlink{position:absolute;left:0;top:56px;width:184px;min-height:48px;display:flex;align-items:center;gap:6px;padding:12px 28px 12px 16px;border:0;background:transparent;color:var(--content);font:inherit;font-size:16px;font-weight:700;line-height:24px;letter-spacing:.2px;cursor:pointer;border-radius:8px}
+.backlink img{width:20px;height:20px}
+
+.iconround{width:48px;height:48px;border-radius:2000px;background:var(--surface-secondary);border:0;display:grid;place-items:center;cursor:pointer;padding:12px}
+.iconround img{width:24px;height:24px}
+
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:22px}
+
+/* ---- 1 · splash ---- */
+#splash .logo{position:absolute;left:-15px;top:35px;width:414px;height:360px}
+#splash .logo img{width:414px;height:360px;display:block;object-fit:contain}
+#splash .cta{position:absolute;left:16px;top:673px}
+#splash .link{position:absolute;left:0;top:737px;width:360px;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;background:transparent;border:0;color:var(--content);font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+#splash .link svg{width:18px;height:18px}
+
+/* ---- 2 · permissions ---- */
+.permcard{width:347px;border-radius:22px;background:var(--card);border:1px solid var(--card-border);padding:16px;position:relative}
+.permcard .badge{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.permcard .badge svg{width:20px;height:20px}
+.permcard h3{margin:0 0 4px;font-size:16px;line-height:20px;font-weight:700;letter-spacing:.2px;color:var(--content)}
+.permcard .allow{width:315px;min-height:50px;margin-top:16px}
+
+/* ---- 3 · welcome ---- */
+.listcard{width:328px;border-radius:16px;background:var(--card);border:1px solid var(--card-border);padding:12px 16px;display:flex;gap:16px;align-items:flex-start}
+.listcard .tile{width:56px;height:56px;flex:none;border-radius:12px;display:grid;place-items:center;margin-top:14px}
+.listcard .tile svg{width:30px;height:30px}
+.listcard h3{margin:0 0 2px;font-size:16px;line-height:24px;font-weight:700;letter-spacing:.2px;color:var(--content)}
+
+/* ---- 4 · turn it around ---- */
+.readercard{width:328px;background:var(--cream);color:var(--on-cream);border-radius:22px;padding:24px}
+.readercard .eyebrow{margin:0 0 8px;font-size:13px;font-weight:700;letter-spacing:.1em;color:#7A3BB5}
+.readercard h2{margin:0;font-size:24px;line-height:32px;font-weight:700;letter-spacing:-.2px}
+.readercard p{margin:12px 0 0;font-size:15px;line-height:21px;color:#2F2A35}
+
+/* ---- 5 · whose turn ---- */
+.choice{position:absolute;left:16px;width:328px;height:260px;border-radius:22px;overflow:hidden;border:0;padding:0;cursor:pointer;text-align:left;font:inherit;color:var(--content);display:block}
+.choice .ttl{position:absolute;left:16px;top:16px;width:150px;font-size:32px;line-height:40px;font-weight:700;letter-spacing:-.32px}
+.choice .exp{position:absolute;left:16px;top:64px;width:140px;font-size:16px;line-height:24px;letter-spacing:.2px}
+.choice .gl{position:absolute;bottom:0;height:110px;width:105px;overflow:hidden}
+.choice .gl img{position:absolute;max-width:none;display:block}
+
+/* ---- 6 · camera AI ---- */
+#sign .cam{position:absolute;left:0;top:0;width:360px;height:701px;overflow:hidden;background:#0B0B0B}
+#sign .cam > img.feed{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#sign .alert{position:absolute;left:50%;top:32px;transform:translateX(-50%);min-height:40px;min-width:144px;max-width:300px;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--info-bg);border:1px solid var(--info-border);transition:background .3s,border-color .3s}
+#sign .alert img{width:20px;height:20px;flex:none}
+#sign .alert span{font-size:14px;line-height:20px;font-weight:500;letter-spacing:.175px;color:var(--content)}
+#sign .alert.locked{background:rgba(10,90,70,.55);border-color:var(--live)}
+#sign .box{position:absolute;left:28px;top:160px;width:303px;height:398px;border-radius:12px;background:var(--capture-fill);border:1px dashed var(--capture-line);transition:border-color .35s,box-shadow .35s,background .35s}
+#sign .box.locked{border:1px solid var(--info-border);box-shadow:0 0 0 1px rgba(138,213,255,.35),0 0 24px rgba(138,213,255,.25);background:rgba(138,213,255,.07)}
+#sign .marks{position:absolute;left:0;top:0;width:360px;height:701px;opacity:0}
+#sign .marks.on{opacity:1}
+#sign .gloss{position:absolute;left:16px;top:466px;width:328px;display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:6px;overflow:hidden}
+#sign .sign-chip{display:inline-flex;flex:none;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:rgba(10,8,14,.72);border:1px solid rgba(255,255,255,.18);font-size:12px;font-weight:700;letter-spacing:.06em;color:#FFF;animation:pop .22s ease-out}
+#sign .sign-chip b{font-weight:700}
+#sign .sign-chip em{font-style:normal;font-weight:500;font-size:11px;color:var(--live)}
+#sign .sign-chip.low{border-color:#E0A24A;color:#F6D9A8}
+#sign .sign-chip.low em{color:#E0A24A}
+@keyframes pop{from{transform:translateY(7px) scale(.94)}to{transform:none}}
+#sign .sheet{position:absolute;left:0;top:581px;width:360px;height:219px;background:rgba(20,20,20,.94);border-radius:28px 28px 0 0;padding:16px 16px 8px;box-shadow:0 1px 2px rgba(0,0,0,.32);backdrop-filter:blur(8px)}
+#sign .sheet .row{display:flex;align-items:center;justify-content:space-between;height:48px}
+#sign .cap{margin:8px 0 0;min-height:60px;font-size:14px;line-height:20px;letter-spacing:.175px;color:var(--content)}
+#sign .cap .pending{color:var(--content-muted)}
+#sign .sheet .btn{margin-top:16px}
+
+/* ---- 7 · speaking / 8 · listening ---- */
+.msgcard{position:absolute;left:16px;top:216px;width:328px;height:282px;border-radius:22px;overflow:hidden;padding:24px}
+.msgcard .lbl{margin:0 0 20px;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.18px}
+.msgcard .body{margin:0;font-size:24px;line-height:32px;letter-spacing:.2px}
+.cream-msg{background:var(--cream);color:var(--on-cream)}
+.cream-msg .lbl{color:rgba(20,16,28,.6)}
+.dark-msg{background:var(--card);border:1px solid var(--card-border);color:var(--content)}
+.dark-msg .lbl{color:var(--content-muted)}
+
+.feedback{position:absolute;left:16px;top:516px;width:328px;height:72px}
+.feedback .line{display:flex;align-items:center;gap:8px;height:20px}
+.feedback .line img{width:17px;height:20px;display:block}
+.feedback .line span{font-size:14px;line-height:20px;letter-spacing:.175px;color:var(--content-muted)}
+.meter{position:absolute;left:24px;top:32px;width:280px;height:32px;display:flex;align-items:center;gap:5px}
+.meter i{display:block;width:3px;border-radius:2px;background:var(--content);height:4px}
+.meter.live i{background:var(--live)}
+
+.spoken b{font-weight:400;color:inherit}
+.spoken .said{color:inherit}
+.spoken .now{color:inherit;background:rgba(95,208,168,.22);border-radius:3px}
+.cream-msg .spoken .now{background:rgba(241,110,0,.18)}
+.spoken .todo{opacity:.38}
+.interim{opacity:.45;border-bottom:1px dotted currentColor}
+
+.handoff{position:absolute;left:16px;top:600px;width:328px}
+.handoff .btn + .btn{margin-top:12px}
+.handoff .ho-note{margin:0 0 4px;font-size:14px;line-height:20px;font-weight:700;color:var(--content)}
+.handoff .ho-sub{margin:0 0 16px;font-size:12px;line-height:16px;color:var(--content-muted)}
+
+/* ---- page notes ---- */
+.notes{margin-top:34px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.note{background:var(--page-card);border:1px solid var(--page-line);border-radius:16px;padding:20px}
+.note h2{margin:0 0 4px;font-size:16px;font-weight:700}
+.note p{margin:0 0 12px;font-size:13px;line-height:1.5;color:var(--page-muted)}
+.note ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.note li{font-size:13.5px;line-height:1.5;color:var(--page-muted)}
+.note li b{display:block;color:var(--page-ink)}
+.note button{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--page-ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+@media (prefers-reduced-motion: reduce){
+  #sign .sign-chip{animation:none}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+  <div class="masthead">
+    <h1>Relay · ASL AI Concept — built from Figma</h1>
+    <p>The eight frames of <b>CONCEPT ASL</b> in code, on the OUDS tokens read from the file. Two layers the static frames could not carry are live here: the microphone listening and transcribing, and the camera reading sign language.</p>
+    <p class="howto"><b>How to try it:</b> tap the chips below to move between screens. Two of them run by themselves — <b>Camera AI</b>, where the phone locks onto a hand and turns signs into English one sign at a time, and <b>Voice AI</b>, where speech arrives as captions that correct themselves as they settle. Both restart every time you open them, so give each about fifteen seconds. Nothing here uses your real camera or microphone.</p>
+  </div>
+
+  <nav class="index" id="index" aria-label="Screens"></nav>
+
+  <div class="stage">
+    <div class="phone" id="phone">
+
+      <!-- ========== 1 · SPLASH ========== -->
+      <section class="screen on" id="splash" aria-label="Relay splash">
+        <div class="logo"><img src="assets/logo.png" alt="Relay, powered by Orange"></div>
+        <button class="btn btn-orange cta" type="button" data-go="perms">Get started</button>
+        <button class="link" type="button" data-go="welcome">
+          What Relay does
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"></path></svg>
+        </button>
+        <div class="handle"><i></i></div>
+      </section>
+
+      <!-- ========== 2 · PERMISSIONS ========== -->
+      <section class="screen" id="perms" aria-label="Permissions">
+        <div class="statusbar"><span class="t">9:30</span><span class="icons"><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="8" height="15" alt=""></span></div>
+
+        <button class="iconround" type="button" style="position:absolute;right:16px;top:60px" aria-label="Mute Relay"><img src="assets/volume.svg" alt=""></button>
+
+        <h1 class="h-xl" style="position:absolute;left:16px;top:112px;width:328px">Two things Relay needs</h1>
+        <p class="b-m" style="position:absolute;left:16px;top:152px;width:328px">You can refuse either one. Relay tells you what you lose.</p>
+
+        <div class="permcard" style="position:absolute;left:6.5px;top:224px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span class="badge" style="background:var(--badge-teal)" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.4a2 2 0 0 1 2-2h2.3l1.4-2.2h6.6l1.4 2.2H19a2 2 0 0 1 2 2v9.2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><circle cx="12" cy="12.6" r="3.6"></circle></svg>
+            </span>
+            <span style="flex:1 1 auto;min-width:0">
+              <h3>The camera</h3>
+              <p class="b-m">Reads your signs so the phone can speak them. Without it you can still type and still read them.</p>
+            </span>
+          </div>
+          <button class="btn btn-cream allow" type="button" data-grant>Allow the camera</button>
+        </div>
+
+        <div class="permcard" style="position:absolute;left:6.5px;top:412px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span class="badge" style="background:var(--badge-purple)" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.6" width="6" height="11" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path><path d="M12 18v3.4"></path></svg>
+            </span>
+            <span style="flex:1 1 auto;min-width:0">
+              <h3>The microphone</h3>
+              <p class="b-m">Hears them speak so you get captions. Without it, they have to type everything on your phone.</p>
+            </span>
+          </div>
+          <button class="btn btn-cream allow" type="button" data-grant>Allow the microphone</button>
+        </div>
+
+        <button class="btn btn-ghostgrey" type="button" id="perm-continue" style="position:absolute;left:16px;top:732px" data-go="welcome">Continue</button>
+        <div class="handle"><i></i></div>
+      </section>
+
+      <!-- ========== 3 · WELCOME ========== -->
+      <section class="screen" id="welcome" aria-label="Welcome to Relay">
+        <div class="statusbar"><span class="t">9:30</span><span class="icons"><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="8" height="15" alt=""></span></div>
+
+        <div style="position:absolute;left:12px;top:64px;display:flex;align-items:center;gap:12px">
+          <img src="assets/logo.png" alt="" width="62" height="62" style="display:block;object-fit:contain">
+          <span>
+            <p class="h-s" style="font-size:22px;line-height:28px;color:var(--content)">Welcome to Relay</p>
+            <p class="l-s" style="margin-top:2px;letter-spacing:.1em">ASL AND ENGLISH</p>
+          </span>
+        </div>
+
+        <div style="position:absolute;left:16px;top:154px;display:flex;flex-direction:column;gap:12px">
+          <div class="listcard">
+            <span class="tile" style="background:var(--badge-teal)" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12V5.6a1.7 1.7 0 0 1 3.4 0v4.8"></path><path d="M12.4 10.4V6a1.7 1.7 0 0 1 3.4 0v8.6a6 6 0 0 1-6 6h-.7a5 5 0 0 1-4.3-2.5L2.8 14a1.7 1.7 0 0 1 2.7-1.9z"></path></svg>
+            </span>
+            <span style="flex:1 1 auto;min-width:0;padding:12px 0">
+              <h3>You sign, it speaks</h3>
+              <p class="b-m">The camera reads your signs. The phone says them out loud, in English.</p>
+            </span>
+          </div>
+          <div class="listcard">
+            <span class="tile" style="background:var(--badge-orange)" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.4" fill="#FFF"></circle><path d="M3.6 19.4a5.6 5.6 0 0 1 10.8 0" fill="#FFF" stroke="none"></path><path d="M17.5 8.5a4.6 4.6 0 0 1 0 7"></path><path d="M20.4 5.6a8.6 8.6 0 0 1 0 12.8"></path></svg>
+            </span>
+            <span style="flex:1 1 auto;min-width:0;padding:12px 0">
+              <h3>They speak, you read or watch</h3>
+              <p class="b-m">Their words arrive as text, or as an avatar signing them. You pick which.</p>
+            </span>
+          </div>
+          <div class="listcard">
+            <span class="tile" style="background:var(--badge-purple)" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6"></rect><path d="M10.5 5.5h3"></path></svg>
+            </span>
+            <span style="flex:1 1 auto;min-width:0;padding:12px 0">
+              <h3>Everything on one phone</h3>
+              <p class="b-m">They install nothing. If they need to type, you hand it over for one box.</p>
+            </span>
+          </div>
+        </div>
+
+        <button class="btn btn-orange" type="button" style="position:absolute;left:16px;top:690px" data-go="turn">Get started</button>
+        <div class="handle"><i></i></div>
+      </section>
+
+      <!-- ========== 4 · TURN IT AROUND ========== -->
+      <section class="screen" id="turn" aria-label="Turn it around">
+        <div class="statusbar"><span class="t">9:30</span><span class="icons"><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="8" height="15" alt=""></span></div>
+        <button class="iconround" type="button" style="position:absolute;right:16px;top:60px" aria-label="Mute Relay"><img src="assets/volume.svg" alt=""></button>
+
+        <h1 class="h-xl" style="position:absolute;left:16px;top:108px;width:328px;font-weight:400">Turn it around…</h1>
+
+        <div class="readercard" style="position:absolute;left:16px;top:248px">
+          <p class="eyebrow">RELAY INTERPRETER</p>
+          <h2>I'm Deaf. This phone speaks for me.</h2>
+          <p>Talk normally. Please look at me, not at the screen.</p>
+        </div>
+
+        <button class="btn btn-orange" type="button" style="position:absolute;left:16px;top:696px" data-go="whose">They've read it</button>
+        <div class="handle"><i></i></div>
+      </section>
+
+      <!-- ========== 5 · WHOSE TURN ========== -->
+      <section class="screen" id="whose" aria-label="Whose turn">
+        <div class="statusbar"><span class="t">9:33</span><span class="icons"><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="8" height="15" alt=""></span></div>
+
+        <div style="position:absolute;left:16px;top:68px;width:328px">
+          <h1 class="h-xl">Whose turn?</h1>
+          <p class="b-m" style="margin-top:4px">Select one of the options</p>
+        </div>
+
+        <button class="choice" type="button" style="top:152px;background:var(--purple)" data-go="listening">
+          <span class="ttl">Listen</span>
+          <span class="exp">They talk. You read it, or watch it signed.</span>
+          <span class="gl" style="left:0"><img src="assets/glyphs.png" alt="" style="width:372%;height:190%;left:-82%;top:-90%"></span>
+        </button>
+
+        <button class="choice" type="button" style="top:432px;background:var(--green)" data-go="sign">
+          <span class="ttl">Sign</span>
+          <span class="exp">You sign. The phone says it out loud.</span>
+          <span class="gl" style="left:16px"><img src="assets/glyphs.png" alt="" style="width:354%;height:190%;left:-254%;top:-90%"></span>
+        </button>
+
+        <button class="btn btn-cream" type="button" style="position:absolute;left:16px;top:728px;color:#000" data-go="speaking">
+          <img src="assets/keyboard.svg" alt="">Type instead
+        </button>
+        <div class="handle"><i></i></div>
+      </section>
+
+      <!-- ========== 6 · CAMERA AI ========== -->
+      <section class="screen" id="sign" aria-label="Sign capture with camera interpretation">
+        <div class="cam">
+          <img class="feed" src="assets/cam.jpg" alt="The camera, pointed at the user signing">
+
+          <svg class="marks" id="marks" viewBox="0 0 360 701" aria-hidden="true">
+            <g id="bones" stroke="#8AD5FF" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".85"></g>
+            <g id="joints"></g>
+          </svg>
+
+          <div class="box" id="capture-box"></div>
+
+          <div class="alert" id="cam-alert">
+            <img src="assets/info.svg" alt="">
+            <span id="cam-alert-text">Show your sign clearly</span>
+          </div>
+
+          <div class="gloss" id="gloss" aria-live="polite" aria-label="Signs recognised"></div>
+        </div>
+
+        <div class="sheet">
+          <div class="row">
+            <p class="h-s muted" id="cam-state">Reading…</p>
+            <button class="iconround" type="button" aria-label="Mute Relay"><img src="assets/volume.svg" alt=""></button>
+          </div>
+          <p class="cap" id="cam-caption" aria-live="polite"><span class="pending">Waiting for your first sign…</span></p>
+          <button class="btn btn-cream" type="button" id="say-it" data-go="speaking" disabled>
+            <img src="assets/speaker.svg" alt="">Say it
+          </button>
+          <div class="handle"><i></i></div>
+        </div>
+      </section>
+
+      <!-- ========== 7 · SPEAKING ========== -->
+      <section class="screen" id="speaking" aria-label="Speaking for you">
+        <div class="statusbar"><span class="t">9:33</span><span class="icons"><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="8" height="15" alt=""></span></div>
+        <button class="backlink" type="button" data-go="whose"><img src="assets/chevron.svg" alt="">Whose turn?</button>
+
+        <div style="position:absolute;left:16px;top:120px;width:328px">
+          <h1 class="h-xl">Speaking for you</h1>
+          <p class="b-m" style="margin-top:8px">Your signed message, spoken aloud.</p>
+        </div>
+
+        <div class="msgcard cream-msg">
+          <p class="lbl">YOUR MESSAGE</p>
+          <p class="body spoken" id="speak-text"></p>
+        </div>
+
+        <div class="feedback">
+          <div class="line"><img src="assets/mic-on.svg" alt="" style="width:20px"><span id="speak-status">Speaking aloud &amp; showing text</span></div>
+          <div class="meter live" id="speak-meter"></div>
+        </div>
+
+        <div class="handoff">
+          <p class="ho-note">Pass the phone to the other person.</p>
+          <p class="ho-sub">Tap Listen to stop playback and hear their reply.</p>
+          <button class="btn btn-cream" type="button" data-go="listening"><img src="assets/speaker.svg" alt="">Tap to listen</button>
+          <button class="btn btn-outline" type="button" data-go="sign">Sign again</button>
+        </div>
+        <div class="handle"><i></i></div>
+      </section>
+
+      <!-- ========== 8 · LISTENING ========== -->
+      <section class="screen" id="listening" aria-label="Listening with live captions">
+        <div class="statusbar"><span class="t">9:33</span><span class="icons"><img src="assets/wifi.svg" width="17" height="17" alt=""><img src="assets/signal.svg" width="17" height="17" alt=""><img src="assets/battery.svg" width="8" height="15" alt=""></span></div>
+        <button class="backlink" type="button" data-go="whose"><img src="assets/chevron.svg" alt="">Whose turn?</button>
+
+        <div style="position:absolute;left:16px;top:120px;width:328px">
+          <h1 class="h-xl">Listening...</h1>
+          <p class="b-m" style="margin-top:8px">Their words appear here as they speak.</p>
+        </div>
+
+        <div class="msgcard dark-msg">
+          <p class="lbl">THEY’RE SAYING</p>
+          <p class="body" id="hear-text" aria-live="polite"></p>
+        </div>
+
+        <div class="feedback">
+          <div class="line"><img src="assets/mic-on.svg" alt=""><span id="hear-status">Microphone on · Live captions</span></div>
+          <div class="meter" id="hear-meter"></div>
+        </div>
+
+        <div class="handoff">
+          <button class="btn btn-outline" type="button" data-go="sign">Watch in sign language</button>
+          <button class="btn btn-cream" type="button" data-go="sign">Reply with signs</button>
+          <button class="btn btn-outline" type="button" id="pause-listen">Pause listening</button>
+        </div>
+        <div class="handle"><i></i></div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note">
+      <h2>The camera layer</h2>
+      <p>What a static frame cannot show: the camera deciding it is looking at a hand, and turning signs into words.</p>
+      <ul>
+        <li><b>Lock, then read</b><span>The dashed box is the design's. It goes solid only once the hand is tracked — so "I am not seeing you" and "I am reading you" never look the same.</span></li>
+        <li><b>Twenty-one landmarks</b><span>The overlay is the hand model the recogniser would actually use, drifting frame to frame rather than sitting still.</span></li>
+        <li><b>Glosses, then English</b><span>Signs land one at a time with a confidence figure. ORANGINA arrives fingerspelled and low, and the question mark comes from raised brows, not a word.</span></li>
+        <li><b>Say it stays disabled</b><span>Until there is a whole sentence. <button type="button" data-go="sign">Run it again</button></span></li>
+      </ul>
+    </div>
+    <div class="note">
+      <h2>The voice layer</h2>
+      <p>The microphone side of the same conversation.</p>
+      <ul>
+        <li><b>Interim words</b><span>The newest words are dotted and dim while the recogniser is still unsure of them, then settle. That flicker is what a live transcript really looks like.</span></li>
+        <li><b>The meter follows the speech</b><span>It falls to near silence between phrases instead of looping, so the bars mean something.</span></li>
+        <li><b>It says when it stops</b><span>At the end of the sentence the status line changes. <button type="button" data-go="listening">Run it again</button></span></li>
+      </ul>
+    </div>
+    <div class="note">
+      <h2>Built from the file</h2>
+      <p>Tokens and assets read from <b>CONCEPT ASL</b>, not eyeballed.</p>
+      <ul>
+        <li><b>OUDS values</b><span>#141414 ground, #EEE content, 64% muted, #793AB3 Listen, #317660 Sign, #FFF5E9 buttons, 22px cards, 8px buttons, 48px targets.</span></li>
+        <li><b>Real assets</b><span>The photo, the logo, the card glyphs and the OUDS icons come from the file. The waveform is the one thing I replaced — the frame holds 34 fixed bars; here they move.</span></li>
+        <li><b>Not connected</b><span>Figma offered Code Connect mappings for the buttons. There is no component library here to map to, so this is plain HTML. Worth doing when it lands in the real app.</span></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
+  var labels = {
+    splash:'Splash', perms:'Permissions', welcome:'What Relay does', turn:'Turn it around',
+    whose:'Whose turn?', sign:'Camera AI', speaking:'Speaking', listening:'Voice AI'
+  };
+  var index = document.getElementById('index');
+  screens.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.go = s.id;
+    b.innerHTML = '<i>' + (i + 1) + '</i>' + (labels[s.id] || s.id);
+    index.appendChild(b);
+  });
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ------------------------------------------------------------------
+     Both AI layers are written as render(t): one pure function of the
+     clock, so any moment can be drawn directly. The loop only supplies
+     the clock, which makes the whole thing seekable and testable.
+     ------------------------------------------------------------------ */
+  var anim = { raf:0, id:null, t0:0, held:0 };
+
+  function stopAnim() { cancelAnimationFrame(anim.raf); anim.raf = 0; anim.id = null; }
+
+  function startAnim(id, from) {
+    stopAnim();
+    anim.id = id;
+    anim.t0 = performance.now() - (from || 0);
+    if (reduce) { render(id, END[id]); return; }
+    (function loop() {
+      if (anim.id !== id) return;
+      render(id, performance.now() - anim.t0);
+      anim.raf = requestAnimationFrame(loop);
+    })();
+  }
+  function holdAnim() { if (anim.id) { anim.held = performance.now() - anim.t0; stopAnim(); } }
+
+  function render(id, t) {
+    if (id === 'sign') renderCamera(t);
+    else if (id === 'listening') renderListening(t);
+    else if (id === 'speaking') renderSpeaking(t);
+  }
+  // test hook: draw any moment of either layer without waiting for it
+  window.__relaySeek = function (id, t) { stopAnim(); render(id, t); };
+
+  /* ---------- level meter, shared by both layers ---------- */
+  function meter(el, t, amp) {
+    if (!el.childElementCount) {
+      for (var i = 0; i < 34; i++) el.appendChild(document.createElement('i'));
+    }
+    var bars = el.children, T = t / 1000;
+    for (var k = 0; k < bars.length; k++) {
+      var w = Math.sin(T * 2.6 + k * 0.55) * Math.sin(T * 1.7 + k * 1.31) * 0.5 + 0.5;
+      bars[k].style.height = (4 + w * 26 * amp).toFixed(1) + 'px';
+    }
+  }
+
+  /* ================= 6 · camera AI ================= */
+  // 21 landmarks in the design's 360 × 701 camera frame, over the hand in the photo.
+  var HAND = [
+    [152,556],
+    [196,520],[244,470],[278,428],[303,398],
+    [86,338],[74,286],[66,250],[62,220],
+    [124,330],[116,262],[110,214],[106,182],
+    [164,330],[160,258],[156,210],[154,180],
+    [204,342],[206,276],[206,232],[204,202]
+  ];
+  var BONES = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],
+               [0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
+  var SIGNS = [
+    { at:1500,  g:'HELLO',           c:97 },
+    { at:2500,  g:'ME',              c:94 },
+    { at:3300,  g:'WANT',            c:96 },
+    { at:4200,  g:'BUY',             c:93 },
+    { at:5200,  g:'BOTTLE',          c:90 },
+    { at:6000,  g:'BIG',             c:88 },
+    { at:7000,  g:'O-R-A-N-G-I-N-A', c:71, note:'spell' },
+    { at:8600,  g:'OTHER',           c:92 },
+    { at:9400,  g:'FLAVOUR',         c:87 },
+    { at:10200, g:'?',               c:98, note:'brows' }
+  ];
+  var SENTENCE = 'Hello, I would like to buy a large bottle of Orangina... Do you have any other flavors?';
+  var LOCK = 900, READ_DONE = 11000;
+
+  function handNodes() {
+    var bones = document.getElementById('bones'), joints = document.getElementById('joints');
+    if (!bones.childElementCount) {
+      BONES.forEach(function () {
+        bones.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'line'));
+      });
+      HAND.forEach(function (p, i) {
+        var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('r', i === 0 ? 6 : (i % 4 === 0 ? 5.5 : 4));
+        c.setAttribute('fill', i % 4 === 0 ? '#FFFFFF' : '#8AD5FF');
+        joints.appendChild(c);
+      });
+    }
+    return { bones: bones.children, joints: joints.children };
+  }
+
+  function drawHand(t) {
+    var n = handNodes(), T = t / 1000;
+    var pts = HAND.map(function (p, i) {
+      return [p[0] + Math.sin(T * 1.3 + i * 0.7) * (1.6 + (i % 4) * 0.5),
+              p[1] + Math.cos(T * 1.1 + i * 0.9) * (1.6 + (i % 4) * 0.5)];
+    });
+    for (var b = 0; b < BONES.length; b++) {
+      var a = pts[BONES[b][0]], z = pts[BONES[b][1]];
+      n.bones[b].setAttribute('x1', a[0].toFixed(1)); n.bones[b].setAttribute('y1', a[1].toFixed(1));
+      n.bones[b].setAttribute('x2', z[0].toFixed(1)); n.bones[b].setAttribute('y2', z[1].toFixed(1));
+    }
+    for (var j = 0; j < pts.length; j++) {
+      n.joints[j].setAttribute('cx', pts[j][0].toFixed(1));
+      n.joints[j].setAttribute('cy', pts[j][1].toFixed(1));
+    }
+  }
+
+  function chipFor(s) {
+    var chip = document.createElement('span');
+    chip.className = 'sign-chip' + (s.c < 80 ? ' low' : '');
+    chip.innerHTML = '<b>' + s.g + '</b><em>' + s.c + '%</em>';
+    if (s.note === 'spell') chip.title = 'fingerspelled';
+    if (s.note === 'brows') chip.title = 'read from raised brows, not a word';
+    return chip;
+  }
+
+  function renderCamera(t) {
+    var box = document.getElementById('capture-box');
+    var marks = document.getElementById('marks');
+    var alertEl = document.getElementById('cam-alert');
+    var alertText = document.getElementById('cam-alert-text');
+    var stateEl = document.getElementById('cam-state');
+    var gloss = document.getElementById('gloss');
+    var cap = document.getElementById('cam-caption');
+    var say = document.getElementById('say-it');
+
+    var locked = t >= LOCK, done = t >= READ_DONE;
+    box.classList.toggle('locked', locked);
+    marks.classList.toggle('on', locked);
+    alertEl.classList.toggle('locked', locked && !done);
+
+    var want = 0;
+    while (want < SIGNS.length && SIGNS[want].at <= t) want++;
+    var from = Math.max(0, want - 3);           // a ticker, not a list: keep the newest three
+    var key = from + ':' + want;
+    if (gloss.dataset.key !== key) {
+      if (gloss.dataset.from === String(from) && gloss.childElementCount < want - from) {
+        for (var k = from + gloss.childElementCount; k < want; k++) gloss.appendChild(chipFor(SIGNS[k]));
+      } else {
+        gloss.innerHTML = '';
+        for (var k2 = from; k2 < want; k2++) gloss.appendChild(chipFor(SIGNS[k2]));
+      }
+      gloss.dataset.from = from;
+      gloss.dataset.key = key;
+    }
+
+    var msg = locked ? 'Hand tracked · keep it in the box' : 'Looking for your hands…';
+    for (var s = 0; s < SIGNS.length; s++) {
+      var sg = SIGNS[s];
+      if (sg.note && t >= sg.at && t < sg.at + 1500) {
+        msg = sg.note === 'spell'
+          ? 'Fingerspelled — hold it a beat longer'
+          : 'Raised brows — reading this as a question';
+      }
+    }
+    if (done) msg = 'Check it before you send it';
+    if (alertText.textContent !== msg) alertText.textContent = msg;
+
+    var st = !locked ? 'Camera on' : (done ? 'Ready to speak' : 'Reading…');
+    if (stateEl.textContent !== st) stateEl.textContent = st;
+
+    if (done) {
+      if (cap.dataset.done !== '1') { cap.textContent = SENTENCE; cap.dataset.done = '1'; }
+      say.disabled = false;
+    } else {
+      if (cap.dataset.done === '1' || !cap.childElementCount) {
+        cap.innerHTML = '<span class="pending">Waiting for your first sign…</span>';
+        cap.dataset.done = '';
+      }
+      say.disabled = true;
+    }
+    drawHand(locked ? t : 0);
+  }
+
+  /* ================= 7 · speaking ================= */
+  var SPEAK_WORDS = SENTENCE.split(' ');
+  var SP_IN = 300, SP_STEP = 290;
+  var SP_END = SP_IN + SPEAK_WORDS.length * SP_STEP;
+
+  function renderSpeaking(t) {
+    var holder = document.getElementById('speak-text');
+    var status = document.getElementById('speak-status');
+    if (holder.childElementCount !== SPEAK_WORDS.length) {
+      holder.innerHTML = '';
+      SPEAK_WORDS.forEach(function (w, i) {
+        var s = document.createElement('span');
+        s.textContent = w + (i < SPEAK_WORDS.length - 1 ? ' ' : '');
+        holder.appendChild(s);
+      });
+    }
+    var spans = holder.children;
+    var i = Math.floor((t - SP_IN) / SP_STEP);
+    var over = t >= SP_END;
+    for (var k = 0; k < spans.length; k++) {
+      spans[k].className = over ? 'said' : (k < i ? 'said' : (k === i ? 'now' : 'todo'));
+    }
+    var amp = over ? 0 : (t < SP_IN ? 0.2 : 0.55 + 0.35 * Math.abs(Math.sin(t / 170)));
+    meter(document.getElementById('speak-meter'), t, amp);
+    var msg = over ? 'Finished speaking · their turn' : 'Speaking aloud & showing text';
+    if (status.textContent !== msg) status.textContent = msg;
+  }
+
+  /* ================= 8 · voice AI ================= */
+  // [word, gap before it] — the gaps are what let the meter fall silent between phrases.
+  var HEAR = [
+    ['“Yes,', 620], ['we', 280], ['have', 280], ['Orangina', 620], ['Rouge', 430],
+    ['and', 780], ['mango-passion', 520], ['fruit', 430], ['in', 280], ['the', 230],
+    ['fridge', 360], ['right', 780], ['behind', 350], ['you.”', 390]
+  ];
+  var ONSET = [], acc = 0;
+  HEAR.forEach(function (p) { acc += p[1]; ONSET.push(acc); });
+  var HEAR_END = acc + 800;
+  var SETTLE = 430;
+  var paused = false;
+
+  function renderListening(t) {
+    var holder = document.getElementById('hear-text');
+    var status = document.getElementById('hear-status');
+
+    var want = 0;
+    while (want < ONSET.length && ONSET[want] <= t) want++;
+    if (holder.childElementCount > want) holder.innerHTML = '';
+    for (var k = holder.childElementCount; k < want; k++) {
+      var s = document.createElement('span');
+      s.textContent = (k ? ' ' : '') + HEAR[k][0];
+      holder.appendChild(s);
+    }
+    var over = t >= HEAR_END;
+    for (var j = 0; j < holder.childElementCount; j++) {
+      holder.children[j].className = (!over && t - ONSET[j] < SETTLE) ? 'interim' : '';
+    }
+
+    var amp = 0;
+    if (want > 0 && !over) amp = Math.max(0.1, 1 - (t - ONSET[want - 1]) / 320);
+    meter(document.getElementById('hear-meter'), t, amp);
+
+    var msg = paused ? 'Microphone paused · Nothing is being heard'
+            : over ? 'They stopped speaking · captions complete'
+            : 'Microphone on · Live captions';
+    if (status.textContent !== msg) status.textContent = msg;
+  }
+
+  var END = { sign: READ_DONE + 900, speaking: SP_END + 300, listening: HEAR_END + 300 };
+
+  /* ---------- routing ---------- */
+  function show(id) {
+    var target = document.getElementById(id);
+    if (!target) return;
+    stopAnim();
+    screens.forEach(function (s) { s.classList.toggle('on', s === target); });
+    index.querySelectorAll('button').forEach(function (b) {
+      b.setAttribute('aria-current', b.dataset.go === id ? 'true' : 'false');
+    });
+    try { if (location.hash.slice(1) !== id) history.replaceState(null, '', '#' + id); } catch (e) {}
+    if (id === 'sign' || id === 'speaking' || id === 'listening') {
+      if (id === 'listening') {
+        paused = false;
+        document.getElementById('pause-listen').textContent = 'Pause listening';
+      }
+      if (id === 'sign') { var g = document.getElementById('gloss'); g.innerHTML = ''; g.dataset.key = ''; g.dataset.from = ''; }
+      render(id, 0);
+      startAnim(id, 0);
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest('[data-go]');
+    if (go) { show(go.dataset.go); return; }
+
+    var grant = e.target.closest('[data-grant]');
+    if (grant) {
+      var on = grant.dataset.on === '1';
+      if (!grant.dataset.off) grant.dataset.off = grant.textContent.trim();
+      grant.dataset.on = on ? '' : '1';
+      grant.textContent = on ? grant.dataset.off : 'Allowed';
+      grant.style.background = on ? 'var(--cream)' : 'var(--badge-teal)';
+      grant.style.color = on ? 'var(--on-cream)' : '#FFFFFF';
+      var n = document.querySelectorAll('#perms [data-grant][data-on="1"]').length;
+      document.getElementById('perm-continue').className = n ? 'btn btn-orange' : 'btn btn-ghostgrey';
+      return;
+    }
+
+    var pause = e.target.closest('#pause-listen');
+    if (pause) {
+      paused = !paused;
+      pause.textContent = paused ? 'Resume listening' : 'Pause listening';
+      if (paused) { holdAnim(); renderListening(anim.held); }
+      else startAnim('listening', anim.held);
+    }
+  });
+
+  var start = location.hash.slice(1);
+  show(document.getElementById(start) ? start : 'splash');
+})();
+</script>
+
+</body>
+</html>
