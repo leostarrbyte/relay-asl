@@ -116,8 +116,8 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
 .card{background:var(--card);border:1px solid var(--card-border);border-radius:22px}
 
 /* ---- 1 · splash ---- */
-#splash .logo{position:absolute;left:-15px;top:35px;width:414px;height:360px}
-#splash .logo img{width:414px;height:360px;display:block;object-fit:contain}
+#splash .logo{position:absolute;left:0;top:35px;width:360px;height:360px}
+#splash .logo img{width:360px;height:360px;display:block;object-fit:contain;image-rendering:auto}
 #splash .cta{position:absolute;left:16px;top:673px}
 #splash .link{position:absolute;left:0;top:737px;width:360px;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;background:transparent;border:0;color:var(--content);font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 #splash .link svg{width:18px;height:18px}
@@ -228,7 +228,7 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
 
       <!-- ========== 1 · SPLASH ========== -->
       <section class="screen on" id="splash" aria-label="Relay splash">
-        <div class="logo"><img src="assets/logo.png" alt="Relay, powered by Orange"></div>
+        <div class="logo"><img src="assets/logo.png" srcset="assets/logo.png 1x, assets/logo@2x.png 2x" alt="Relay, powered by Orange"></div>
         <button class="btn btn-orange cta" type="button" data-go="perms">Get started</button>
         <button class="link" type="button" data-go="welcome">
           What Relay does
