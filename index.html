@@ -116,8 +116,10 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
 .card{background:var(--card);border:1px solid var(--card-border);border-radius:22px}
 
 /* ---- 1 · splash ---- */
-#splash .logo{position:absolute;left:0;top:35px;width:360px;height:360px}
-#splash .logo img{width:360px;height:360px;display:block;object-fit:contain;image-rendering:auto}
+#splash .logo{position:absolute;left:0;top:100px;width:360px;display:flex;flex-direction:column;align-items:center;text-align:center}
+#splash .logo-mark{width:260px;height:170px;display:block}
+#splash .logo-word{margin:4px 0 0;font-size:88px;line-height:1;font-weight:500;letter-spacing:-1px;color:#fff}
+#splash .logo-by{margin:14px 0 0;font-size:15px;line-height:20px;font-weight:700;color:var(--orange)}
 #splash .cta{position:absolute;left:16px;top:673px}
 #splash .link{position:absolute;left:0;top:737px;width:360px;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;background:transparent;border:0;color:var(--content);font:inherit;font-size:15px;font-weight:700;cursor:pointer}
 #splash .link svg{width:18px;height:18px}
@@ -228,7 +230,26 @@ body{margin:0;background:var(--page-bg);color:var(--page-ink);font-family:var(--
 
       <!-- ========== 1 · SPLASH ========== -->
       <section class="screen on" id="splash" aria-label="Relay splash">
-        <div class="logo"><img src="assets/logo.png" srcset="assets/logo.png 1x, assets/logo@2x.png 2x" alt="Relay, powered by Orange"></div>
+        <div class="logo" role="img" aria-label="Relay, powered by Orange">
+          <svg class="logo-mark" viewBox="0 0 260 170" aria-hidden="true">
+            <rect x="10" y="20" width="150" height="104" rx="52" transform="rotate(-18 85 72)" fill="#6F3EB4"/>
+            <path d="M46 74 Q80 42 114 74 Q80 106 46 74Z" fill="#FBEFE6"/>
+            <circle cx="80" cy="74" r="13" fill="#6F3EB4"/>
+            <line x1="56" y1="50" x2="104" y2="98" stroke="#6F3EB4" stroke-width="16" stroke-linecap="round"/>
+            <line x1="56" y1="50" x2="104" y2="98" stroke="#FBEFE6" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="190" cy="104" r="60" fill="#00917A" stroke="#141414" stroke-width="6"/>
+            <g transform="translate(153 73) scale(2.6)" fill="none" stroke="#FBEFE6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"/>
+              <path d="M14 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"/>
+              <path d="M20.5 8a5 5 0 0 1 0 7"/>
+              <path d="M23.5 6a8 8 0 0 1 0 11"/>
+            </g>
+            <line x1="166" y1="140" x2="214" y2="68" stroke="#00917A" stroke-width="16" stroke-linecap="round"/>
+            <line x1="166" y1="140" x2="214" y2="68" stroke="#FBEFE6" stroke-width="8" stroke-linecap="round"/>
+          </svg>
+          <p class="logo-word" aria-hidden="true">RELAY</p>
+          <p class="logo-by" aria-hidden="true">Powered by Orange</p>
+        </div>
         <button class="btn btn-orange cta" type="button" data-go="perms">Get started</button>
         <button class="link" type="button" data-go="welcome">
           What Relay does
